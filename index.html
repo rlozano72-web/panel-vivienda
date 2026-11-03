@@ -183,6 +183,28 @@ s{color:var(--muted);font-weight:400;font-size:11.5px;display:block}
 #iVista td a{color:var(--accent,#1d5fd1);font-weight:600;text-decoration:none}
 #iVista td a:hover{text-decoration:underline}
 #iVista td.c,#iVista th.c{text-align:center}
+
+.btnAdd{background:#fff;color:var(--accent,#1d5fd1);border:1.5px solid var(--accent,#1d5fd1);border-radius:8px;padding:7px 12px;font:600 13px system-ui,sans-serif;cursor:pointer}
+.btnAdd:hover{background:var(--accent,#1d5fd1);color:#fff}
+.srcTag.mi{color:#7a3b00;background:#fff1d6;border-color:#f2d9a6}
+.manAcc{font-size:11px;margin-top:3px;color:var(--muted)}
+.manAcc a{color:var(--accent,#1d5fd1);cursor:pointer;text-decoration:none}
+.manAcc a:hover{text-decoration:underline}
+dialog#dlgMan{border:0;border-radius:14px;padding:0;width:min(640px,94vw);max-height:92vh;overflow:auto;box-shadow:0 12px 50px rgba(20,30,50,.28);color:var(--ink,#1b2430)}
+dialog#dlgMan::backdrop{background:rgba(20,30,50,.45)}
+#frmMan{padding:20px 22px 18px}
+#frmMan h2{margin:0 0 4px;font-size:18px}
+#frmMan .ayuda{margin:0 0 14px;color:var(--muted);font-size:13px}
+#frmMan .rejilla{display:grid;grid-template-columns:repeat(2,1fr);gap:11px 14px}
+#frmMan label{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:600;color:#44505e}
+#frmMan label.ancho{grid-column:1/-1}
+#frmMan input,#frmMan select,#frmMan textarea{font:inherit;font-size:14px;font-weight:400;padding:8px 10px;border:1px solid var(--line,#d5dbe3);border-radius:8px;background:#fff;color:inherit}
+#frmMan input:focus,#frmMan select:focus,#frmMan textarea:focus{outline:2px solid var(--accentSoft,#cfe0fb);border-color:var(--accent,#1d5fd1)}
+#frmMan .pie{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}
+#frmMan .pie button{font:600 14px system-ui,sans-serif;padding:9px 16px;border-radius:8px;cursor:pointer;border:1px solid var(--line,#d5dbe3);background:#fff;color:inherit}
+#frmMan .pie button.ok{background:var(--accent,#1d5fd1);border-color:var(--accent,#1d5fd1);color:#fff}
+#frmMan .err{color:#b3261e;font-size:13px;margin-top:10px;min-height:1em}
+@media(max-width:560px){#frmMan .rejilla{grid-template-columns:1fr}}
 </style></head><body><div class="wrap">
 <header>
 <h1>Radar de inmuebles — Norte de Bogotá</h1>
@@ -246,6 +268,7 @@ s{color:var(--muted);font-weight:400;font-size:11.5px;display:block}
 <label class="chk"><input type="checkbox" id="fNew"> Solo novedades</label>
 <label class="chk" id="boxMarc"><input type="checkbox" id="fMarc"> <b>Solo marcados</b> <span id="nMarc"></span></label>
 <label>Barrio<input type="search" id="fQ" placeholder="Cedritos, Colina..."></label>
+<button type="button" class="btnAdd" id="btnMan" style="display:none" title="Agrega un apto que conseguiste por otro lado, para seguirlo aquí">＋ Agregar apto manual</button>
 <span class="segBar" id="segBar">
   <a class="btnMini" id="btnExp" download="seguimiento.json">Guardar seguimiento</a>
   <label class="btnMini" for="btnImp">Cargar…<input type="file" id="btnImp" accept="application/json" hidden></label>
@@ -266,11 +289,37 @@ s{color:var(--muted);font-weight:400;font-size:11.5px;display:block}
 <b>Portales</b>: <span class="srcTag fr">FR</span> Fincaraíz, <span class="srcTag mc">MC</span> Metrocuadrado y <span class="srcTag cc">CC</span> Ciencuadras. Ciencuadras no deja buscar por su API (exige una credencial del navegador, que no se toca), así que sus avisos se descubren por su sitemap público y se leen ficha por ficha: es una <b>muestra</b>, no todo su inventario. A cambio da la antigüedad en años exactos. <span class="srcTag pp">PP</span> PuntoPropiedad. <span class="srcTag hm">HM</span> Houm (inmobiliaria con ventas y arriendos propios; sí publica estrato, ascensor, parqueaderos y piso cuando su asesor los registró; la antigüedad no la da). Si el mismo inmueble está en los dos (mismo canon o precio, tamaño y distribución) aparece una sola vez con las dos etiquetas, cada una enlaza a su aviso. Un inmueble que ya conocías por un portal no cuenta como «nuevo» por aparecer en el otro. En Metrocuadrado la antigüedad viene en rangos distintos (0–5, 5–10, 10–20, más de 20 años) y no publica dirección exacta.<br>
 <b>Localidad</b> acepta varias a la vez y recuerda tu elección en cada pestaña.<br>
 <b>Retirado</b> = el aviso ya no está publicado en Fincaraíz (arrendado, vendido o bajado). No se borra de la lista: queda tachado y en gris durante 45 días, con los días que lleva fuera, y siempre al final de cualquier orden. El selector <b>Aviso</b> los oculta o los aísla.<br>
+<b>Apto manual (solo en Arriendo)</b>: con «＋ Agregar apto manual» sumas un apto que encontraste por otro lado. Queda arriba de la lista, ya marcado, con etiqueta <span class="srcTag mi">MI</span>, y no se oculta por los filtros de precio, estrato o ascensor. Se guarda solo en este navegador y entra en «Guardar seguimiento».<br>
 <b>Seguimiento (solo en Arriendo)</b>: marca la casilla de los que te llamen la atención y escribe una nota. Se guardan en este navegador y sobreviven a la actualización diaria del radar. Con <b>Guardar seguimiento</b> descargas un <code>seguimiento.json</code>; si lo dejas en la carpeta <code>~/radar-inmuebles/</code>, el radar lo lee y te avisa en el brief cuando un marcado tuyo desaparece del portal.<br>
 <b>Sobre presupuesto</b> = pasa de tu tope pero entra en el rango ampliado; oculto salvo que subas el filtro de precio.
 </div>
 </div>
 </div>
+<dialog id="dlgMan">
+<form id="frmMan" method="dialog" novalidate>
+<h2 id="mTitulo">Agregar apto manual</h2>
+<p class="ayuda">Para un apto que encontraste por otro lado (un conocido, un letrero, otro portal). Queda arriba de la lista de Arriendo, ya marcado «Me interesa», y se guarda en este navegador. Solo el barrio y el canon son obligatorios.</p>
+<div class="rejilla">
+<label>Barrio *<input id="m_barrio" maxlength="80" placeholder="Cedritos, Colina…"></label>
+<label>Localidad<select id="m_loc"></select></label>
+<label class="ancho">Dirección o edificio<input id="m_dir" maxlength="120" placeholder="Cra 15 # 140-20, Edificio…"></label>
+<label>Canon mensual (COP) *<input id="m_precio" inputmode="numeric" placeholder="2.800.000"></label>
+<label>Administración (COP)<input id="m_admin" inputmode="numeric" placeholder="350.000"></label>
+<label>Área (m²)<input id="m_area" inputmode="decimal" placeholder="72"></label>
+<label>Piso<input id="m_piso" inputmode="numeric" placeholder="3"></label>
+<label>Habitaciones<input id="m_hab" inputmode="numeric" placeholder="3"></label>
+<label>Baños<input id="m_banos" inputmode="numeric" placeholder="2"></label>
+<label>Parqueaderos<input id="m_parq" inputmode="numeric" placeholder="1"></label>
+<label>Estrato<select id="m_estrato"><option value="">—</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+<label>Ascensor<select id="m_ascensor"><option value="?">No sé</option><option value="si">Sí</option><option value="no">No</option></select></label>
+<label>Enlace (si lo tiene)<input id="m_url" maxlength="400" placeholder="https://…"></label>
+<label class="ancho">Contacto (quién lo ofrece)<input id="m_contacto" maxlength="120" placeholder="Nombre y teléfono"></label>
+<label class="ancho">Nota de seguimiento<textarea id="m_nota" rows="2" maxlength="400" placeholder="Llamé, visita el jueves a las 4…"></textarea></label>
+</div>
+<div class="err" id="mErr" role="alert"></div>
+<div class="pie"><button type="button" id="mCancel">Cancelar</button><button type="submit" class="ok">Guardar apto</button></div>
+</form>
+</dialog>
 <div id="panelInmo" hidden>
 <div class="bar">
 <label>Buscar<input id="iQ" type="search" placeholder="Nombre de la inmobiliaria…"></label>
@@ -320,6 +369,7 @@ function pintarChips(){
   el('boxVerif').style.display = esOtros() ? '' : 'none';
   el('boxMarc').style.display  = base()==='arriendo' ? '' : 'none';
   el('segBar').style.display   = base()==='arriendo' ? '' : 'none';
+  el('btnMan').style.display   = OP==='arriendo' ? '' : 'none';
   actualizarContadorMarcados();
 }
 
@@ -359,14 +409,14 @@ function pintarLocs(){
 }
 
 // ---------------------------------------------------------------- portales
-const ABREV = {'Fincaraíz':'FR', 'Metrocuadrado':'MC', 'Ciencuadras':'CC', 'PuntoPropiedad':'PP', 'Houm':'HM'};
+const ABREV = {'Fincaraíz':'FR', 'Metrocuadrado':'MC', 'Ciencuadras':'CC', 'PuntoPropiedad':'PP', 'Houm':'HM', 'Manual':'MI'};
 function linksDe(x){
   const crudos = (x.links && x.links.length) ? x.links : [{f:x.fuente||'Fincaraíz', u:x.url}];
   const porPortal = new Map();
   for(const l of crudos){ if(!porPortal.has(l.f)) porPortal.set(l.f, {f:l.f, u:l.u, n:0}); porPortal.get(l.f).n++; }
   return [...porPortal.values()];
 }
-const tagsDe = x => linksDe(x).map(l=>
+const tagsDe = x => linksDe(x).filter(l=>l.u).map(l=>
   `<a class="srcTag ${(ABREV[l.f]||'').toLowerCase()}" href="${l.u}" target="_blank" rel="noopener"
       title="Abrir en ${l.f}${l.n>1?` (${l.n} avisos iguales)`:''}">${ABREV[l.f]||l.f}${l.n>1?'×'+l.n:''}</a>`).join('');
 function opcionesFuente(){
@@ -439,7 +489,13 @@ function filtrar(){
         hab=+el('fHab').value, asc=el('fAsc').checked, onlyNew=el('fNew').checked,
         soloMarc=el('fMarc').checked, pub=el('fPub').value, vf=el('fVerif').value,
         q=el('fQ').value.trim().toLowerCase();
-  return DATA.filter(x =>
+  return DATA.filter(x => x.manual
+    // lo que agregaste a mano no se oculta por precio, estrato, ascensor…: solo por
+    // localidad, portal, marcados, novedades y la búsqueda de barrio
+    ? ((!locs.length || locs.includes(x.loc)) && (!fu || fu==='Manual') && !onlyNew &&
+       (!soloMarc || marcado(x.id)) && !pub.startsWith('off') &&
+       (!q || (x.barrio+' '+x.dir+' '+x.contacto).toLowerCase().includes(q)))
+    : (
     (!locs.length || locs.includes(x.loc)) &&
     (!fu || (x.fuentes||[x.fuente||'Fincaraíz']).includes(fu)) &&
     (!tier || (tier==='AB' ? (x.tier==='A'||x.tier==='B') : x.tier===tier)) &&
@@ -450,7 +506,7 @@ function filtrar(){
     (!asc || x.ascensor) && (!onlyNew || x.nuevo || x.bajo_precio) &&
     (!soloMarc || marcado(x.id)) &&
     (!pub || (pub==='pub' ? !x.retirado : !!x.retirado)) &&
-    (!q || (x.barrio+' '+x.dir+' '+x.titulo).toLowerCase().includes(q)));
+    (!q || (x.barrio+' '+x.dir+' '+x.titulo).toLowerCase().includes(q))));
 }
 
 function render(){
@@ -462,6 +518,7 @@ function render(){
   const nulo = (col && col.nulo) ? col.nulo : (()=>false);
   r.sort((a,b)=>{
     if(!!a.retirado !== !!b.retirado) return a.retirado?1:-1;   // retirados al final
+    if(!!a.manual !== !!b.manual) return a.manual?-1:1;         // lo agregado a mano, arriba
     const na=nulo(a), nb=nulo(b);
     if(na!==nb) return na?1:-1;
     const d=f(a)>f(b)?1:f(a)<f(b)?-1:0;
@@ -488,7 +545,9 @@ function tabla(r){
 const sinDato = '<span class="no">n/d</span>';
 const noDeclara = '<span class="no" title="El portal no publica este dato">¿?</span>';
 const CELDA = {
-  ver:   (x,c)=>`<td><a class="btnTab" ${c.href}>Ver aviso ↗</a><div class="srcs">${tagsDe(x)}</div></td>`,
+  ver:   (x,c)=>x.manual
+    ? `<td>${x.url?`<a class="btnTab" ${c.href}>Ver aviso ↗</a>`:'<span class="no">Sin enlace</span>'}<div class="srcs">${tagsDe(x)}</div><div class="manAcc"><span class="srcTag mi">MI</span> <a data-edit="${x.id}">Editar</a> · <a data-del="${x.id}">Quitar</a></div></td>`
+    : `<td><a class="btnTab" ${c.href}>Ver aviso ↗</a><div class="srcs">${tagsDe(x)}</div></td>`,
   tier:  (x,c)=>`<td><span class="pill t${x.tier}">${x.tier}</span> ${c.flags}</td>`,
   verif: (x,c)=>{ const det=(x.verif_txt||'').includes(':') ? x.verif_txt.slice(x.verif_txt.indexOf(':')+1).trim() : '';
                   return `<td><span class="pill v${x.verif}">${VERIF_ETQ[x.verif]||'—'}</span>${det?`<div class="sub2">${det}</div>`:''}</td>`; },
@@ -497,7 +556,7 @@ const CELDA = {
         title="Marcar para seguimiento" aria-label="Marcar ${x.barrio}"></td>`,
   nota:  (x,c)=>`<td><input type="text" class="nota" data-id="${x.id}" value="${(notaDe(x.id)||'').replace(/"/g,'&quot;')}"
         placeholder="llamé, visita jueves..."></td>`,
-  ubi:   (x,c)=>`<td><a class="tb tbLink" ${c.href}>${x.barrio||'—'}</a><div class="tdir">${x.loc}${x.dir?' · '+x.dir:''}${x.retirado?` · <b style="color:#8a94a0">retirado hace ${x.retirado_dias} día${x.retirado_dias===1?'':'s'}</b>`:''}</div></td>`,
+  ubi:   (x,c)=>`<td><a class="tb tbLink" ${c.href}>${x.barrio||'—'}</a><div class="tdir">${x.loc}${x.dir?' · '+x.dir:''}${x.contacto?' · ☎ '+x.contacto:''}${x.retirado?` · <b style="color:#8a94a0">retirado hace ${x.retirado_dias} día${x.retirado_dias===1?'':'s'}</b>`:''}</div></td>`,
   precio:(x,c)=>`<td class="num"><b>${cop(x.precio)}</b>${x.precio_antes?`<s>antes ${cop(x.precio_antes)}</s>`:''}</td>`,
   m2v:   (x,c)=>`<td class="num">${x.m2v?cop(x.m2v):sinDato}</td>`,
   admin: (x,c)=>`<td class="num">${x.admin?cop(x.admin):sinDato}</td>`,
@@ -519,7 +578,7 @@ function fila(x){
          + (x.sobre_presupuesto?'<span class="pill pOver">+Presup.</span>':''),
     ec: x.estado_txt==='Para estrenar'||x.estado_txt==='Remodelado' ? 'ok'
       : (x.estado_txt==='Obra gris'||x.estado_txt==='Requiere arreglos' ? 'bad':''),
-    href: `href="${linksDe(x)[0].u}" target="_blank" rel="noopener"`,
+    href: linksDe(x)[0].u ? `href="${linksDe(x)[0].u}" target="_blank" rel="noopener"` : 'href="#" onclick="return false"',
     mk: marcado(x.id)
   };
   return `<tr class="${c.mk?'marcada ':''}${x.retirado?'retirada':((x.nuevo||x.bajo_precio)?'nuevoRow':'')}">${
@@ -574,7 +633,7 @@ function actualizarContadorMarcados(){
   b.classList.toggle('dest', n>0);
   b.textContent = n ? `Guardar seguimiento (${n})` : 'Guardar seguimiento';
   b.href = 'data:application/json;charset=utf-8,' +
-           encodeURIComponent(JSON.stringify(SEG, null, 2));
+           encodeURIComponent(JSON.stringify(Object.assign({}, SEG, {_manuales: MANUALES}), null, 2));
 }
 
 // Un solo listener para toda la tabla: así marcar o escribir una nota no
@@ -604,8 +663,12 @@ el('btnImp').addEventListener('change', e=>{
       for(const [id, v] of Object.entries(entra)){
         if(v && (v.m || v.n)){ SEG[id] = v; n++; }
       }
-      guardarSeguimiento(); actualizarContadorMarcados(); render();
-      alert(`Se cargaron ${n} marcas de seguimiento.`);
+      let nm = 0;
+      if(Array.isArray(entra._manuales))
+        for(const m of entra._manuales)
+          if(m && m.id && m.d && !MANUALES.some(x=>x.id===m.id)){ MANUALES.push(m); nm++; }
+      guardarSeguimiento(); guardarManuales(); refrescarManuales();
+      alert(`Se cargaron ${n} marcas de seguimiento` + (nm ? ` y ${nm} aptos manuales.` : '.'));
     }catch(err){ alert('Ese archivo no es un seguimiento válido.'); }
     e.target.value = '';
   };
@@ -712,6 +775,108 @@ el('iXls').onclick = descargarExcel;
 el('cInmo').textContent = INMOBILIARIAS.length;
 el('tInmo').onclick = () => mostrarInmo(true);
 if(!INMOBILIARIAS.length) el('tInmo').style.display = 'none';
+
+// ---------------------------------------------------------------- aptos manuales (solo Arriendo)
+// Aptos que Rodrigo consiguió por otro lado. Viven en localStorage de este navegador
+// (igual que las marcas) y se mezclan arriba de la lista de Arriendo. Cada texto que
+// escribe la persona se escapa antes de pintarse.
+const MAN_KEY = 'radar-manuales-v1';
+let MANUALES = [];
+try{ MANUALES = JSON.parse(localStorage.getItem(MAN_KEY) || '[]'); if(!Array.isArray(MANUALES)) MANUALES = []; }catch(e){ MANUALES = []; }
+function guardarManuales(){ try{ localStorage.setItem(MAN_KEY, JSON.stringify(MANUALES)); }catch(e){ console.warn('no se pudieron guardar los aptos manuales', e); } }
+const escM = t => String(t==null?'':t).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const BASE_ARR = HAY_ARRIENDO ? PAQUETE.arriendo.rows : [];
+const MAN_CAMPOS = ['barrio','loc','dir','precio','admin','area','piso','hab','banos','parq','estrato','ascensor','url','contacto'];
+
+function filaManual(m){
+  const d = m.d || {}, pos = v => { const n = Number(v); return isFinite(n) && n > 0 ? n : 0; };
+  const precio = pos(d.precio), area = pos(d.area);
+  const piso = (d.piso === '' || d.piso == null || !isFinite(Number(d.piso))) ? null : Number(d.piso);
+  return {
+    id: m.id, manual: true, fuente: 'Manual', fuentes: ['Manual'],
+    links: d.url ? [{f:'Manual', u:d.url}] : [], url: d.url || '',
+    titulo: escM(d.barrio), barrio: escM(d.barrio), loc: escM(d.loc || 'Otra'),
+    dir: escM(d.dir || ''), contacto: escM(d.contacto || ''),
+    precio, admin: pos(d.admin), area, hab: pos(d.hab), banos: pos(d.banos), piso, parq: pos(d.parq),
+    estrato: d.estrato ? Number(d.estrato) : null, ascensor: d.ascensor === 'si',
+    desconocidos: d.ascensor === '?' ? ['ascensor'] : [],
+    m2v: area && precio ? Math.round(precio/area) : 0,
+    antig: 0, antig_txt: 'Sin dato', antig_rank: 99, antig_filtro: 99, anio: null, edad: null,
+    estado_txt: 'Sin especificar', estado_rank: 2, remodelado: false,
+    nuevo: false, bajo_precio: false, retirado: false, sobre_presupuesto: false, tier: 'D'
+  };
+}
+function mezclarManuales(){
+  if(HAY_ARRIENDO) PAQUETE.arriendo.rows = MANUALES.map(filaManual).concat(BASE_ARR);
+}
+function refrescarManuales(){
+  if(!HAY_ARRIENDO) return;
+  mezclarManuales();
+  if(OP === 'arriendo') DATA = PAQUETE.arriendo.rows;
+  opcionesFuente(); pintarLocs(); pintarChips(); render();
+}
+
+const dlgMan = el('dlgMan');
+let MAN_EDITANDO = null;
+el('m_loc').innerHTML = '<option value="">— elige —</option>' + LOCALIDADES.map(l=>`<option>${escM(l)}</option>`).join('') + '<option value="Otra">Otra zona</option>';
+function abrirManual(id){
+  MAN_EDITANDO = id || null;
+  const m = MANUALES.find(x=>x.id===id), d = m ? m.d : {};
+  el('mTitulo').textContent = m ? 'Editar apto manual' : 'Agregar apto manual';
+  for(const k of MAN_CAMPOS) el('m_'+k).value = d[k] != null && d[k] !== 0 ? d[k] : (k === 'ascensor' ? '?' : '');
+  el('m_nota').value = m ? notaDe(m.id) : '';
+  el('mErr').textContent = '';
+  dlgMan.showModal();
+  el('m_barrio').focus();
+}
+const aEntero  = v => { const n = parseInt(String(v).replace(/[^\d]/g,''), 10); return isFinite(n) ? n : 0; };
+const aDecimal = v => { const n = parseFloat(String(v).replace(',', '.').replace(/[^\d.]/g,'')); return isFinite(n) ? n : 0; };
+function enlaceValido(u){
+  if(!u) return '';
+  if(!/^[a-z][a-z0-9+.-]*:/i.test(u)) u = 'https://' + u;
+  try{ const x = new URL(u); return (x.protocol === 'http:' || x.protocol === 'https:') ? x.href : null; }catch(e){ return null; }
+}
+el('btnMan').onclick = () => abrirManual(null);
+el('mCancel').onclick = () => dlgMan.close();
+el('frmMan').addEventListener('submit', ev => {
+  ev.preventDefault();
+  const v = k => el('m_'+k).value.trim();
+  const url = enlaceValido(v('url'));
+  if(!v('barrio'))          return void (el('mErr').textContent = 'Escribe el barrio.');
+  if(!aEntero(v('precio'))) return void (el('mErr').textContent = 'Escribe el canon mensual.');
+  if(url === null)          return void (el('mErr').textContent = 'El enlace no es válido (debe ser una dirección web http o https).');
+  const d = {
+    barrio: v('barrio'), loc: v('loc') || 'Otra', dir: v('dir'), precio: aEntero(v('precio')),
+    admin: aEntero(v('admin')), area: aDecimal(v('area')), piso: v('piso') === '' ? '' : aEntero(v('piso')),
+    hab: aEntero(v('hab')), banos: aEntero(v('banos')), parq: aEntero(v('parq')),
+    estrato: v('estrato'), ascensor: v('ascensor'), url, contacto: v('contacto')
+  };
+  let id = MAN_EDITANDO;
+  if(id){
+    const m = MANUALES.find(x=>x.id===id); if(m) m.d = d;
+  }else{
+    id = 'man-' + Date.now().toString(36) + Math.random().toString(36).slice(2,5);
+    MANUALES.push({id, d, creado: new Date().toISOString().slice(0,10)});
+    fijarMarca(id, true);                    // se agrega para seguirlo: nace marcado
+  }
+  fijarNota(id, el('m_nota').value.trim());
+  guardarManuales();
+  dlgMan.close();
+  refrescarManuales();
+  actualizarContadorMarcados();
+});
+el('vista').addEventListener('click', e => {
+  const ed = e.target.closest('[data-edit]'), del = e.target.closest('[data-del]');
+  if(ed){ e.preventDefault(); abrirManual(ed.dataset.edit); }
+  else if(del){
+    e.preventDefault();
+    if(!confirm('¿Quitar este apto de tu seguimiento? Se borran también sus notas.')) return;
+    const id = del.dataset.del;
+    MANUALES = MANUALES.filter(x=>x.id!==id); delete SEG[id];
+    guardarManuales(); guardarSeguimiento(); refrescarManuales(); actualizarContadorMarcados();
+  }
+});
+mezclarManuales();
 for(const [k,id] of Object.entries(TABS)){
   el('t'+id).onclick=()=>{ if(EN_INMO) mostrarInmo(false); cambiarPestana(k); };
   if(!PAQUETE[k]) el('t'+id).style.display='none';
